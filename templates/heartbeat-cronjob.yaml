@@ -28,7 +28,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
         spec:
-          serviceAccountName: {{ include "t12-falco.fullname" . }}-heartbeat
+          # serviceAccountName: {{ include "t12-falco.fullname" . }}-heartbeat
           restartPolicy: Never
           {{- if .Values.heartbeat.activeDeadlineSeconds }}
           activeDeadlineSeconds: {{ .Values.heartbeat.activeDeadlineSeconds }}
@@ -42,7 +42,7 @@ spec:
                   # Probe Falco DS
                   FALCO_DS=$(kubectl -n {{ .Release.Namespace }} get ds \
                     -l app.kubernetes.io/name=falco,app.kubernetes.io/instance={{ .Release.Name }} \
-                    -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+                    -o jsonpath='{.items[0].metadata.name}' || true)
 
                   if [ -n "$FALCO_DS" ]; then
                     FALCO_DESIRED=$(kubectl -n {{ .Release.Namespace }} get ds "$FALCO_DS" -o jsonpath='{.status.desiredNumberScheduled}')
@@ -61,7 +61,7 @@ spec:
                   # Probe Sidekick Deployment
                   SK_DEP=$(kubectl -n {{ .Release.Namespace }} get deploy \
                     -l app.kubernetes.io/name=falcosidekick,app.kubernetes.io/instance={{ .Release.Name }} \
-                    -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+                    -o jsonpath='{.items[0].metadata.name}' || true)
 
                   if [ -n "$SK_DEP" ]; then
                     SK_DESIRED=$(kubectl -n {{ .Release.Namespace }} get deploy "$SK_DEP" -o jsonpath='{.spec.replicas}')
