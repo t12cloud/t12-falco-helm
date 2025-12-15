@@ -42,5 +42,5 @@ spec:
               command: ["/bin/sh","-c"]
               args:
                 - |
-                  curl -sS -X POST {{ .Values.heartbeat.endpoint | quote }}                     --connect-timeout {{ .Values.heartbeat.curl.connectTimeoutSeconds }}                     --max-time {{ .Values.heartbeat.curl.maxTimeSeconds }}                     -H "Content-Type: application/json"                     -H "X-CWP-SEC: "                     -H "X-INTEGRATION-ID: "                     -H "X-CLUSTER-IDENTIFIER: "                     -d "{\"source\":\"falco\",\"ts\":\"2025-12-13T13:47:06Z\"}"
+                  curl -sS -X POST {{ .Values.heartbeat.endpoint | quote }} --connect-timeout {{ .Values.heartbeat.curl.connectTimeoutSeconds }} --max-time {{ .Values.heartbeat.curl.maxTimeSeconds }} -H "Content-Type: application/json" -H "X-CWP-SEC: " -H "X-INTEGRATION-ID: " -H "X-CLUSTER-IDENTIFIER: " -d "{\"source\":\"falco\",\"ts\":\"2025-12-13T13:47:06Z\"}"
 {{- end }}
