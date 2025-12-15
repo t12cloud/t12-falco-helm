@@ -1,0 +1,46 @@
+{{- if .Values.heartbeat.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "t12-falco.fullname" . }}-{{ .Values.heartbeat.nameSuffix }}
+  labels:
+    {{- include "t12-falco.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.heartbeat.schedule | quote }}
+  concurrencyPolicy: {{ .Values.heartbeat.concurrencyPolicy | quote }}
+  successfulJobsHistoryLimit: {{ .Values.heartbeat.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.heartbeat.failedJobsHistoryLimit }}
+  {{- if .Values.heartbeat.startingDeadlineSeconds }}
+  startingDeadlineSeconds: {{ .Values.heartbeat.startingDeadlineSeconds }}
+  {{- end }}
+  jobTemplate:
+    spec:
+      backoffLimit: {{ .Values.heartbeat.backoffLimit }}
+      template:
+        metadata:
+          labels:
+            {{- include "t12-falco.labels" . | nindent 12 }}
+            {{- with .Values.heartbeat.podLabels }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.heartbeat.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        spec:
+          restartPolicy: Never
+          {{- if .Values.heartbeat.activeDeadlineSeconds }}
+          activeDeadlineSeconds: {{ .Values.heartbeat.activeDeadlineSeconds }}
+          {{- end }}
+          containers:
+            - name: heartbeat
+              image: "{{ .Values.heartbeat.image.repository }}:{{ .Values.heartbeat.image.tag }}"
+              imagePullPolicy: {{ .Values.heartbeat.image.pullPolicy }}
+              envFrom:
+                - secretRef:
+                    name: {{ .Values.heartbeat.secretRefName | quote }}
+              command: ["/bin/sh","-c"]
+              args:
+                - |
+                  curl -sS -X POST {{ .Values.heartbeat.endpoint | quote }}                     --connect-timeout {{ .Values.heartbeat.curl.connectTimeoutSeconds }}                     --max-time {{ .Values.heartbeat.curl.maxTimeSeconds }}                     -H "Content-Type: application/json"                     -H "X-CWP-SEC: "                     -H "X-INTEGRATION-ID: "                     -H "X-CLUSTER-IDENTIFIER: "                     -d "{\"source\":\"falco\",\"ts\":\"2025-12-13T13:47:06Z\"}"
+{{- end }}

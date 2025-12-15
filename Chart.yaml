@@ -1,0 +1,11 @@
+apiVersion: v2
+name: t12-falco
+description: Wrapper chart that installs Falco + Falcosidekick and a T12 heartbeat CronJob
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+
+dependencies:
+  - name: falco
+    repository: https://falcosecurity.github.io/charts
+    version: "7.0.2"
