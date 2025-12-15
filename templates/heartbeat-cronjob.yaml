@@ -37,10 +37,7 @@ spec:
               image: bitnami/kubectl:latest
               command: ["/bin/sh","-c"]
               args:
-                - |                
-                  apt-get update -y > /dev/null
-                  apt-get install -y curl > /dev/null
-
+                - |
                   # Probe Falco DS
                   FALCO_DS=$(kubectl -n {{ .Release.Namespace }} get ds \
                     -l app.kubernetes.io/name=falco,app.kubernetes.io/instance={{ .Release.Name }} \
