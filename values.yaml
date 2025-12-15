@@ -18,7 +18,7 @@ falco:
 heartbeat:
   enabled: true
   nameSuffix: "heartbeat"
-  schedule: "*/2 * * * *"
+  schedule: "*/15 * * * *"
   concurrencyPolicy: "Forbid"
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 3
@@ -27,11 +27,6 @@ heartbeat:
   activeDeadlineSeconds: 60 # hard kill if it runs too long
 
   backoffLimit: 1
-
-  image:
-    repository: curlimages/curl
-    tag: "8.5.0"
-    pullPolicy: IfNotPresent
 
   secretRefName: t12-cwp-secret
 
