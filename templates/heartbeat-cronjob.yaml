@@ -34,7 +34,7 @@ spec:
           {{- end }}
           containers:
             - name: heartbeat
-              image: bitnami/kubectl:1.30.0
+              image: bitnami/kubectl:bitnami/kubectl:sha256-017d3194df6b9947a519960d80e2d361239d773d91120add3cb3a51aa8128f6f
               command: ["/bin/sh","-c"]
               args:
                 - |
