@@ -28,6 +28,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
         spec:
+          serviceAccountName: {{ include "t12-falco.fullname" . }}-heartbeat
           restartPolicy: Never
           {{- if .Values.heartbeat.activeDeadlineSeconds }}
           activeDeadlineSeconds: {{ .Values.heartbeat.activeDeadlineSeconds }}
