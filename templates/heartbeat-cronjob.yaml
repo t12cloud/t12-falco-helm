@@ -34,13 +34,71 @@ spec:
           {{- end }}
           containers:
             - name: heartbeat
-              image: "{{ .Values.heartbeat.image.repository }}:{{ .Values.heartbeat.image.tag }}"
-              imagePullPolicy: {{ .Values.heartbeat.image.pullPolicy }}
-              envFrom:
-                - secretRef:
-                    name: {{ .Values.heartbeat.secretRefName | quote }}
+              image: bitnami/kubectl:1.30.0
               command: ["/bin/sh","-c"]
               args:
                 - |
-                  curl -sS -X POST {{ .Values.heartbeat.endpoint | quote }} --connect-timeout {{ .Values.heartbeat.curl.connectTimeoutSeconds }} --max-time {{ .Values.heartbeat.curl.maxTimeSeconds }} -H "Content-Type: application/json" -H "X-CWP-SEC: " -H "X-INTEGRATION-ID: " -H "X-CLUSTER-IDENTIFIER: " -d "{\"source\":\"falco\",\"ts\":\"$(date -u +%FT%TZ)\"}"
-{{- end }}
+                  apk add --no-cache curl >/dev/null
+
+                  # Probe Falco DS
+                  FALCO_DS=$(kubectl -n {{ .Release.Namespace }} get ds \
+                    -l app.kubernetes.io/name=falco,app.kubernetes.io/instance={{ .Release.Name }} \
+                    -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+
+                  if [ -n "$FALCO_DS" ]; then
+                    FALCO_DESIRED=$(kubectl -n {{ .Release.Namespace }} get ds "$FALCO_DS" -o jsonpath='{.status.desiredNumberScheduled}')
+                    FALCO_READY=$(kubectl -n {{ .Release.Namespace }} get ds "$FALCO_DS" -o jsonpath='{.status.numberReady}')
+                    if [ "$FALCO_DESIRED" = "$FALCO_READY" ] && [ "$FALCO_DESIRED" != "0" ]; then
+                      FALCO_STATUS="ok"
+                    else
+                      FALCO_STATUS="degraded"
+                    fi
+                  else
+                    FALCO_STATUS="missing"
+                    FALCO_DESIRED="0"
+                    FALCO_READY="0"
+                  fi
+
+                  # Probe Sidekick Deployment
+                  SK_DEP=$(kubectl -n {{ .Release.Namespace }} get deploy \
+                    -l app.kubernetes.io/name=falcosidekick,app.kubernetes.io/instance={{ .Release.Name }} \
+                    -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+
+                  if [ -n "$SK_DEP" ]; then
+                    SK_DESIRED=$(kubectl -n {{ .Release.Namespace }} get deploy "$SK_DEP" -o jsonpath='{.spec.replicas}')
+                    SK_READY=$(kubectl -n {{ .Release.Namespace }} get deploy "$SK_DEP" -o jsonpath='{.status.readyReplicas}')
+                    SK_READY=${SK_READY:-0}
+                    if [ "$SK_DESIRED" = "$SK_READY" ] && [ "$SK_DESIRED" != "0" ]; then
+                      SK_STATUS="ok"
+                    else
+                      SK_STATUS="degraded"
+                    fi
+                  else
+                    SK_STATUS="missing"
+                    SK_DESIRED="0"
+                    SK_READY="0"
+                  fi
+
+                  TS="$(date -u +%FT%TZ)"
+
+                  PAYLOAD=$(cat <<EOF
+                  {
+                    "source":"falco",
+                    "ts":"$TS",
+                    "namespace":"{{ .Release.Namespace }}",
+                    "release":"{{ .Release.Name }}",
+                    "falco":{"status":"$FALCO_STATUS","desired":$FALCO_DESIRED,"ready":$FALCO_READY},
+                    "sidekick":{"status":"$SK_STATUS","desired":$SK_DESIRED,"ready":$SK_READY}
+                  }
+                  EOF
+                  )
+
+                  curl -sS -X POST {{ .Values.heartbeat.endpoint | quote }} \
+                    --connect-timeout {{ .Values.heartbeat.curl.connectTimeoutSeconds }} \
+                    --max-time {{ .Values.heartbeat.curl.maxTimeSeconds }} \
+                    -H "Content-Type: application/json" \
+                    -H "X-CWP-SEC: $CWP_SEC" \
+                    -H "X-INTEGRATION-ID: $INTEGRATION_ID" \
+                    -H "X-CLUSTER-IDENTIFIER: $CLUSTER_IDENTIFIER" \
+                    -d "$PAYLOAD"
+

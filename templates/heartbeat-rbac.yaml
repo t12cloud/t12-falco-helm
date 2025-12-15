@@ -1,0 +1,30 @@
+{{- if .Values.heartbeat.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "t12-falco.fullname" . }}-heartbeat
+  labels:
+    {{- include "t12-falco.labels" . | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "t12-falco.fullname" . }}-heartbeat
+rules:
+  - apiGroups: ["apps"]
+    resources: ["daemonsets", "deployments"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "t12-falco.fullname" . }}-heartbeat
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "t12-falco.fullname" . }}-heartbeat
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "t12-falco.fullname" . }}-heartbeat
+{{- end }}
+
