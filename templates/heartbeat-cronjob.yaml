@@ -101,4 +101,4 @@ spec:
                     -H "X-INTEGRATION-ID: $INTEGRATION_ID" \
                     -H "X-CLUSTER-IDENTIFIER: $CLUSTER_IDENTIFIER" \
                     -d "$PAYLOAD"
-
+{{- end }}
