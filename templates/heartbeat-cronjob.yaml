@@ -36,6 +36,9 @@ spec:
           containers:
             - name: heartbeat
               image: bitnami/kubectl:latest
+              envFrom:
+                - secretRef:
+                    name: {{ .Values.heartbeat.secretRefName }}
               command: ["/bin/sh","-c"]
               args:
                 - |
