@@ -11,7 +11,7 @@ falco:
     config:
       debug: true
       webhook:
-        address: "https://umt65skc2e.execute-api.us-east-1.amazonaws.com/prod/v1/cwp/events"
+        address: "https://api.t12.io/v1/cwp/events"
         method: POST
 
 # Values used by this wrapper chart
@@ -30,7 +30,7 @@ heartbeat:
 
   secretRefName: t12-cwp-secret
 
-  endpoint: "https://7678c2255829.ngrok-free.app"
+  endpoint: "https://api.t12.io/v1"
 
   # Curl timeouts to avoid stuck Jobs
   curl:

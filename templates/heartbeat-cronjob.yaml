@@ -92,12 +92,13 @@ spec:
                   EOF
                   )
 
-                  curl -sS -X POST {{ .Values.heartbeat.endpoint | quote }} \
+                  curl -sS -X POST {{ .Values.heartbeat.endpoint | quote }}/cwp/agents/$AGENT_ID/heartbeats \
                     --connect-timeout {{ .Values.heartbeat.curl.connectTimeoutSeconds }} \
                     --max-time {{ .Values.heartbeat.curl.maxTimeSeconds }} \
                     -H "Content-Type: application/json" \
-                    -H "X-CWP-SEC: $CWP_SEC" \
-                    -H "X-INTEGRATION-ID: $INTEGRATION_ID" \
+                    -H "X-SECRET: $SECRET" \
                     -H "X-CLUSTER-IDENTIFIER: $CLUSTER_IDENTIFIER" \
+                    -H "X-API-KEY: $API_KEY" \
+                    -H "X-TENANT-ID: $TENANT_ID" \
                     -d "$PAYLOAD"
 {{- end }}
