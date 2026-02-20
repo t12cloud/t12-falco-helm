@@ -92,6 +92,9 @@ spec:
                   EOF
                   )
 
+                  echo "AGENT_ID: $AGENT_ID"
+                  echo "SECRET: $SECRET"
+                  
                   curl -sS -X POST {{ .Values.heartbeat.endpoint | quote }}/cwp/agents/$AGENT_ID/heartbeats \
                     --connect-timeout {{ .Values.heartbeat.curl.connectTimeoutSeconds }} \
                     --max-time {{ .Values.heartbeat.curl.maxTimeSeconds }} \
