@@ -13,6 +13,12 @@ falco:
       webhook:
         address: "https://api.t12.io/v1/cwp/events"
         method: POST
+      extraEnv:
+        - name: WEBHOOK_CUSTOMHEADERS
+          valueFrom:
+            secretKeyRef:
+              name: t12-falco-sidekick-customheaders
+              key: customHeaders
 
 # Values used by this wrapper chart
 heartbeat:
@@ -25,7 +31,6 @@ heartbeat:
 
   startingDeadlineSeconds: 120 # if missed schedule, how long controller will still start it
   activeDeadlineSeconds: 60 # hard kill if it runs too long
-
   backoffLimit: 1
 
   secretRefName: t12-cwp-secret
