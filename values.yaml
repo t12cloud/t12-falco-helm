@@ -18,7 +18,7 @@ falco:
 heartbeat:
   enabled: true
   nameSuffix: "heartbeat"
-  schedule: "*/15 * * * *"
+  schedule: "*/1 * * * *"
   concurrencyPolicy: "Forbid"
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 3
