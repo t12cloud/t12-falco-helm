@@ -85,18 +85,19 @@ spec:
 
                   PAYLOAD=$(cat <<EOF
                   {
-                    "source":"falco",
-                    "ts":"$TS",
-                    "namespace":"{{ .Release.Namespace }}",
-                    "release":"{{ .Release.Name }}",
-                    "falco":{"status":"$FALCO_STATUS","desired":$FALCO_DESIRED,"ready":$FALCO_READY},
-                    "sidekick":{"status":"$SK_STATUS","desired":$SK_DESIRED,"ready":$SK_READY}
+                    "agentVersion":"1.0",
+                    "generatedAt":"$TS",
+                    "payload":{
+                      "source":"falco",
+                      "ts":"$TS",
+                      "namespace":"{{ .Release.Namespace }}",
+                      "release":"{{ .Release.Name }}",
+                      "falco":{"status":"$FALCO_STATUS","desired":$FALCO_DESIRED,"ready":$FALCO_READY},
+                      "sidekick":{"status":"$SK_STATUS","desired":$SK_DESIRED,"ready":$SK_READY}
+                    }
                   }
                   EOF
                   )
-
-                  echo "AGENT_ID: $AGENT_ID"
-                  echo "SECRET: $SECRET"
                   
                   curl -sS -X POST {{ .Values.heartbeat.endpoint | quote }}/cwp/agents/$AGENT_ID/heartbeats \
                     --connect-timeout {{ .Values.heartbeat.curl.connectTimeoutSeconds }} \
