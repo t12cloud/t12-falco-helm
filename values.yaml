@@ -30,10 +30,12 @@ falco:
               key: customHeaders
 
 # Values used by this wrapper chart
+# NB: Don't change the name from heartbeat. I just implemented a rule override (under /falco-rules)
+# that assumes this name
 heartbeat:
   enabled: true
   nameSuffix: "heartbeat"
-  schedule: "*/1 * * * *"
+  schedule: "0 * * * *"
   concurrencyPolicy: "Forbid"
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 3
