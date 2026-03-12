@@ -1,0 +1,18 @@
+{{- $cmName := printf "%s-rules" (include "t12-falco.name" .) -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $cmName }}
+  labels:
+    {{- include "t12-falco.labels" . | nindent 4 }}
+data:
+{{- $files := .Files.Glob "falco-rules/*.yaml" }}
+{{- if $files }}
+{{- range $path, $bytes := $files }}
+  {{ base $path }}: |-
+{{ $bytes | indent 4 }}
+{{- end }}
+{{- else }}
+  # No custom rules found in falco-rules/
+  _placeholder: "add your .yaml rule files to falco-rules/"
+{{- end }}
