@@ -1,0 +1,6 @@
+- macro: heartbeat_k8s_api_access
+  condition: container.name = "heartbeat"
+
+- rule: Contact K8S API Server From Container
+  append: true
+  condition: and not heartbeat_k8s_api_access

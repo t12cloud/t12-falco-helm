@@ -5,11 +5,12 @@ falco:
     httpOutput:
       enabled: true
       url: "http://falco-sidekick:2801"
-    extraVolumes:
+  mounts:
+    volumes:
       - name: custom-rules
         configMap:
           name: t12-falco-rules
-    extraVolumeMounts:
+    volumeMounts:
       - name: custom-rules
         mountPath: /etc/falco/rules.d
         readOnly: true
@@ -29,10 +30,12 @@ falco:
               key: customHeaders
 
 # Values used by this wrapper chart
+# NB: Don't change the name from heartbeat. I just implemented a rule override (under /falco-rules)
+# that assumes this name
 heartbeat:
   enabled: true
   nameSuffix: "heartbeat"
-  schedule: "*/1 * * * *"
+  schedule: "0 * * * *"
   concurrencyPolicy: "Forbid"
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 3
