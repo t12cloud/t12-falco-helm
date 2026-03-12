@@ -8,9 +8,9 @@ metadata:
 data:
 {{- $files := .Files.Glob "falco-rules/*.yaml" }}
 {{- if $files }}
-{{- range $path, $bytes := $files }}
+{{- range $path, $_ := $files }}
   {{ base $path }}: |-
-{{ $bytes | indent 4 }}
+{{ $.Files.Get $path | indent 4 }}
 {{- end }}
 {{- else }}
   # No custom rules found in falco-rules/
