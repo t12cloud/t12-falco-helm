@@ -3,7 +3,7 @@
 # This rule triggers when a shell is spawned by a non-root user as an example.
 - rule: Example Shell Spawn by Non-Root
   desc: Detect shells spawned by non-root users (example)
-  condition: spawn and proc.name in ("bash", "sh", "zsh") and user.uid != 0
-  output: "Shell spawned by non-root (user=%user.name command=%proc.cmdline)"
+  condition: proc.name in ("bash", "sh", "zsh") and user.uid != 0
+  output: "EXAMPLE == Shell spawned by non-root (user=%user.name command=%proc.cmdline)"
   priority: NOTICE
   tags: [example]
