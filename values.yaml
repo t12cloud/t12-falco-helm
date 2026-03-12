@@ -5,15 +5,15 @@ falco:
     httpOutput:
       enabled: true
       url: "http://falco-sidekick:2801"
-    mounts:
-      volumes:
-        - name: custom-rules
-          configMap:
-            name: t12-falco-rules
-      volumeMounts:
-        - name: custom-rules
-          mountPath: /etc/falco/rules.d
-          readOnly: true
+  mounts:
+    volumes:
+      - name: custom-rules
+        configMap:
+          name: t12-falco-rules
+    volumeMounts:
+      - name: custom-rules
+        mountPath: /etc/falco/rules.d
+        readOnly: true
 
   falcosidekick:
     enabled: true
