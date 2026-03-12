@@ -5,6 +5,14 @@ falco:
     httpOutput:
       enabled: true
       url: "http://falco-sidekick:2801"
+    extraVolumes:
+      - name: custom-rules
+        configMap:
+          name: t12-falco-rules
+    extraVolumeMounts:
+      - name: custom-rules
+        mountPath: /etc/falco/rules.d
+        readOnly: true
 
   falcosidekick:
     enabled: true
@@ -19,14 +27,6 @@ falco:
             secretKeyRef:
               name: t12-falco-sidekick-customheaders
               key: customHeaders
-    extraVolumes:
-      - name: custom-rules
-        configMap:
-          name: t12-falco-rules
-    extraVolumeMounts:
-      - name: custom-rules
-        mountPath: /etc/falco/rules.d
-        readOnly: true
 
 # Values used by this wrapper chart
 heartbeat:
